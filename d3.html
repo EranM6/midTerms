@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="data.js"></script>
+    <script src="diagram.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        svg {
+            font-family: "Open Sans Hebrew", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            overflow: visible;
+        }
+
+        .diagrams {
+            display: flex;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="diagrams">
+    <svg
+            class="senators"
+            width="100%"
+            xmlns="http://www.w3.org/2000/svg"
+            xml:lang='he'>
+
+    </svg>
+    <svg
+            class="representatives"
+            width="100%"
+            xmlns="http://www.w3.org/2000/svg"
+            xml:lang='he'>
+
+    </svg>
+</div>
+
+<script>
+  diagram(d3.select('.senators'), senators, states)
+  diagram(d3.select('.representatives'), representatives, states)
+</script>
+</body>
