@@ -692,7 +692,7 @@ const senators = [
   },
   {
     name: 'Sharp Baker',
-    position: 1,
+    position: -2,
     state: 'NE',
   },
   {
@@ -705,7 +705,7 @@ const senators = [
     position: 0,
     state: 'TN',
   },
-]
+];
 
 const representatives = [
   {
@@ -2443,7 +2443,7 @@ const representatives = [
   },
   {
     'name': 'King Skinner',
-    'position': 1,
+    'position': -2,
     state: 'OH',
   },
   {
