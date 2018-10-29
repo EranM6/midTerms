@@ -31,7 +31,6 @@ const diagram = (svg, candidates, states) => {
 			let level = 1;
 
 			const getDistanceFromEdge = function(radius){
-        console.log(radius)
 				switch (Math.abs(candidatesOfType[0].position)) {
 					case 2:
 						// return 1.25;
@@ -82,7 +81,6 @@ const diagram = (svg, candidates, states) => {
 					}
 					result.push(candidate)
 				});
-      console.log('----------------')
 			return result
 		}, []);
 
@@ -171,7 +169,7 @@ const diagram = (svg, candidates, states) => {
 		}
 	};
 
-	const buildParagraph = text => (
+	const addTextElements = text => (
 		text.each(function () {
 			const text = d3.select(this);
 			if (text.text()) {
@@ -298,12 +296,12 @@ const diagram = (svg, candidates, states) => {
 			.append('text')
 			.attr('class', d => `${d.name.split(' ')[ 0 ]}-${d.state} info`)
 			.text(d => d.info)
-			.call(buildParagraph);
+			.call(addTextElements);
 
 		svg.selectAll('.candidates > text')
 			.transition(t)
 			.attr('opacity', d => {
-				if (activeState) {
+				if (activeState && d.info) {
 					if (activeState.symbol === d.state) {
 						return 1
 					}
