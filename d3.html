@@ -45,6 +45,10 @@
 			position: relative;
 		}
 
+        .senate {
+            direction: rtl;
+        }
+
 		canvas {
 			position: absolute;
 			width: 100%;
@@ -54,36 +58,36 @@
 </head>
 
 <body>
-<!--<div class="svgDiagrams">-->
-	<!--<svg-->
-		<!--class="senators"-->
-		<!--width='50%'-->
-		<!--viewBox="0 0 840 840"-->
-		<!--xmlns="http://www.w3.org/2000/svg"-->
-		<!--xml:lang='he'></svg>-->
-	<!--<svg-->
-		<!--class="representatives"-->
-		<!--width='50%'-->
-		<!--viewBox="0 0 840 840"-->
-		<!--xmlns="http://www.w3.org/2000/svg"-->
-		<!--xml:lang='he'></svg>-->
-<!--</div>-->
-<div class="canvasDiagrams">
-	<div class="wrapper">
-		<canvas class="senators" width='840' height='840'></canvas>
-	</div>
-
-	<div class="wrapper">
-		<canvas class="representatives" width='840' height='840'></canvas>
-	</div>
+<div class="svgDiagrams">
+	<svg
+		class="senate"
+		width='50%'
+		viewBox="0 0 840 840"
+		xmlns="http://www.w3.org/2000/svg"
+		xml:lang='he'></svg>
+	<svg
+		class="house"
+		width='50%'
+		viewBox="0 0 840 840"
+		xmlns="http://www.w3.org/2000/svg"
+		xml:lang='he'></svg>
 </div>
+<!--<div class="canvasDiagrams">-->
+	<!--<div class="wrapper">-->
+		<!--<canvas class="senate" width='840' height='840'></canvas>-->
+	<!--</div>-->
+
+	<!--<div class="wrapper">-->
+		<!--<canvas class="house" width='840' height='840'></canvas>-->
+	<!--</div>-->
+<!--</div>-->
 
 <script>
-	// svgDiagram(d3.selectAll('.svgDiagrams > .senators'), senators, states);
-	// svgDiagram(d3.selectAll('.svgDiagrams > .representatives'), representatives, states);
+	svgDiagram(d3.selectAll('.svgDiagrams > .senate'), senate, states);
+	svgDiagram(d3.selectAll('.svgDiagrams > .house'), house, states);
 
-	canvasDiagram(d3.selectAll('.canvasDiagrams .senators'), senators, states);
-	canvasDiagram(d3.selectAll('.canvasDiagrams .representatives'), representatives, states)
+	// canvasDiagram(d3.selectAll('.canvasDiagrams .senate'), senate, states);
+	// canvasDiagram(d3.selectAll('.canvasDiagrams .house'), house, states)
 
 </script>
 </body>
