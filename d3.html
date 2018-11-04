@@ -1,55 +1,89 @@
 <!DOCTYPE html>
 <head>
-    <meta charset="utf-8">
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="data.js"></script>
-    <script src="diagram.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+	<meta charset="utf-8">
+	<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+	<script type="text/javascript" src="data.js"></script>
+	<script type="text/javascript" src="utils.js"></script>
+	<script type="text/javascript" src="svgDiagram.js"></script>
+	<script type="text/javascript" src="mobileDiagram.js"></script>
+	<script type="text/javascript" src="canvasDiagram.js"></script>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
 
-        body {
-            margin: 0;
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        }
+		body {
+			margin: 0;
+			position: fixed;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
 
-        svg {
-            font-family: "Open Sans Hebrew", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            overflow: visible;
-        }
+		svg {
+			font-family: "Open Sans Hebrew", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			overflow: visible;
+		}
 
-        .diagrams {
-            display: flex;
-        }
+		.svgDiagrams {
+			display: flex;
+			width: 100%;
+			height: 840px;
+		}
 
-    </style>
+		.canvasDiagrams {
+			display: flex;
+			width: 100%;
+			/*flex-direction: column;*/
+		}
+
+		.wrapper {
+			width: 100%;
+			height: 0;
+			padding-bottom: 100%;
+			position: relative;
+		}
+
+		canvas {
+			position: absolute;
+			width: 100%;
+			height: 50%;
+		}
+	</style>
 </head>
 
 <body>
-<div class="diagrams">
-    <svg
-            class="senators"
-            width="100%"
-            xmlns="http://www.w3.org/2000/svg"
-            xml:lang='he'>
+<!--<div class="svgDiagrams">-->
+	<!--<svg-->
+		<!--class="senators"-->
+		<!--width='50%'-->
+		<!--viewBox="0 0 840 840"-->
+		<!--xmlns="http://www.w3.org/2000/svg"-->
+		<!--xml:lang='he'></svg>-->
+	<!--<svg-->
+		<!--class="representatives"-->
+		<!--width='50%'-->
+		<!--viewBox="0 0 840 840"-->
+		<!--xmlns="http://www.w3.org/2000/svg"-->
+		<!--xml:lang='he'></svg>-->
+<!--</div>-->
+<div class="canvasDiagrams">
+	<div class="wrapper">
+		<canvas class="senators" width='840' height='840'></canvas>
+	</div>
 
-    </svg>
-    <svg
-            class="representatives"
-            width="100%"
-            xmlns="http://www.w3.org/2000/svg"
-            xml:lang='he'>
-
-    </svg>
+	<div class="wrapper">
+		<canvas class="representatives" width='840' height='840'></canvas>
+	</div>
 </div>
 
 <script>
-  diagram(d3.select('.senators'), senators, states);
-  diagram(d3.select('.representatives'), representatives, states)
+	// svgDiagram(d3.selectAll('.svgDiagrams > .senators'), senators, states);
+	// svgDiagram(d3.selectAll('.svgDiagrams > .representatives'), representatives, states);
+
+	canvasDiagram(d3.selectAll('.canvasDiagrams .senators'), senators, states);
+	canvasDiagram(d3.selectAll('.canvasDiagrams .representatives'), representatives, states)
+
 </script>
 </body>
