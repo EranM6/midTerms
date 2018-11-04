@@ -1,88 +1,18 @@
-const diagram = (svg, candidates, states) => {
-	const radius = states.length * 8;
-	const candidateRadius = (((Math.PI * Math.pow(radius, 2)) / candidates.length) / radius) + 8;
-	const stateRadius = 20;
-	const dimensions = (radius * 2) + (stateRadius * 2);
+const svgDiagram = (svg, candidates, states) => {
+	const {
+		radius,
+		candidateRadius,
+		stateRadius,
+		dimensions,
+	} = getInitParams(states.length, candidates.length);
+
 	let activeState = null;
 	let activeCandidate = null;
 
 	const t = d3.transition().duration(1000);
 
-	const statesNodes = states.map((state, index) => {
-		const angle = (index / (states.length / 2)) * Math.PI; // Calculate the angle at which the element will be placed.
-		state.x = (radius * Math.sin(angle)) + (dimensions / 2); // Calculate the x position of the element.
-		state.y = (radius * Math.cos(angle)) + (dimensions / 2); // Calculate the y position of the element.
-		return state
-	});
-
-	const candidatesNodes = candidates
-		.reduce((candidates, candidate) => {
-			const positionMap = { '-2': 0, '-1': 1, 0: 2, 1: 3, 2: 4 };
-			const arrayPosition = positionMap[ candidate.position ];
-			candidates[ arrayPosition ].push(candidate);
-			return candidates
-		}, [ [], [], [], [], [] ])
-		.reduce((result, candidatesOfType) => {
-			const getPosition = distanceFromEdge => {
-				const arc = Math.floor((radius / distanceFromEdge) * Math.PI);
-				const itemsPerArc = Math.floor(arc  / (candidateRadius * 2));
-				return { itemsPerArc, arc, };
-			};
-			let level = 1;
-
-			const getDistanceFromEdge = function(radius){
-				switch (Math.abs(candidatesOfType[0].position)) {
-					case 2:
-						// return 1.25;
-						return (Math.sqrt(radius) / stateRadius) + ((1 / stateRadius) * Math.pow(candidateRadius / 3, 1));
-					case 1:
-						// return 2;
-						return (Math.sqrt(radius) / stateRadius) + ((1 / stateRadius) * Math.pow(candidateRadius / 3, 2));
-					default:
-						// return 5;
-						return (Math.sqrt(radius) / stateRadius) + ((1 / stateRadius) * Math.pow(candidateRadius / 3, 3));
-				}
-			};
-			let lastIndex = 0;
-      let distanceFromEdge = getDistanceFromEdge(radius);
-      candidatesOfType
-				.forEach((candidate, index) => {
-					const { itemsPerArc, arc, } = getPosition(distanceFromEdge);
-					const scale = d3.scaleLinear()
-						.range([0, candidatesOfType.length])
-						.domain([lastIndex, candidatesOfType.length]);
-
-					if (candidate.position < 0) {
-						const angle = (candidatesOfType.length - lastIndex) < itemsPerArc
-							? ((scale(index) + 0.5) / candidatesOfType.length) * Math.PI * -1
-							: (((index - lastIndex) + 0.5) / itemsPerArc) * Math.PI * -1;
-						candidate.x = (radius / distanceFromEdge * Math.sin(angle)) + (dimensions / 2);
-						candidate.y = (radius / distanceFromEdge * Math.cos(angle)) + (dimensions / 2);
-					}
-					else if (candidate.position > 0) {
-						const angle = (candidatesOfType.length - lastIndex) < itemsPerArc
-							? ((scale(index) + 0.5) / candidatesOfType.length) * Math.PI
-							: (((index - lastIndex) + 0.5) / itemsPerArc) * Math.PI;
-						candidate.x = (radius / distanceFromEdge * Math.sin(angle)) + (dimensions / 2);
-						candidate.y = (radius / distanceFromEdge * Math.cos(angle)) + (dimensions / 2);
-					}
-					else {
-						// const angle = (index / (candidatesOfType.length / 2)) * Math.PI;
-						const angle = (index / (candidatesOfType.length / 2)) * Math.PI;
-						candidate.x = (radius / distanceFromEdge * Math.cos(angle)) + (dimensions / 2);
-						candidate.y = (radius / distanceFromEdge * Math.sin(angle)) + (dimensions / 2);
-					}
-
-					if (lastIndex + itemsPerArc <= index + 1) {
-						lastIndex = index + 1;
-            // distanceFromEdge +=  distanceFromEdge * (level / candidateRadius);
-            distanceFromEdge =  getDistanceFromEdge(arc / Math.PI);
-						level++;
-					}
-					result.push(candidate)
-				});
-			return result
-		}, []);
+	const statesNodes = getStatesNodes({ states, radius, dimensions, });
+	const candidatesNodes = getCandidatesNodes({ candidates, radius, candidateRadius, stateRadius, dimensions, });
 
 	const toggleTooltip = d => {
 		if (!activeCandidate) {
@@ -154,21 +84,6 @@ const diagram = (svg, candidates, states) => {
 		}
 	};
 
-	const getColor = position => {
-		switch (position) {
-			case -2:
-				return '#0049B6';
-			case -1:
-				return '#7FA3DB';
-			case 1:
-				return '#F08C91';
-			case 2:
-				return '#E11923';
-			default:
-				return '#B2B2B2'
-		}
-	};
-
 	const addTextElements = text => (
 		text.each(function () {
 			const text = d3.select(this);
@@ -194,22 +109,22 @@ const diagram = (svg, candidates, states) => {
 					.attr('style', 'font-weight: 700; Line-height:30px;')
 					.text(data[ 0 ].name);
 				let newText = tooltip.append('text').attr('x', width + padding).attr('y', 0).attr('dy', `${(++lineNumber * lineHeight) + padding}px`);
-				while (word = words.pop()) {
-					line.push(word);
-					newText.text(line.join(' '));
-					if (newText.node().getComputedTextLength() > width) {
-						line.pop();
-						newText.text(line.join(' '));
-						line = [ word ];
-						newText = tooltip.append('text').attr('x', width + padding).attr('y', 0).attr('dy', `${(++lineNumber * lineHeight) + padding}px`)
-							.text(word)
-					}
-				}
+				// while (word = words.pop()) {
+				// 	line.push(word);
+				// 	newText.text(line.join(' '));
+				// 	if (newText.node().getComputedTextLength() > width) {
+				// 		line.pop();
+				// 		newText.text(line.join(' '));
+				// 		line = [ word ];
+				// 		newText = tooltip.append('text').attr('x', width + padding).attr('y', 0).attr('dy', `${(++lineNumber * lineHeight) + padding}px`)
+				// 			.text(word)
+				// 	}
+				// }
 				bg
 					.attr('width', `${width + (padding * 2)}px`)
 					.attr('height', `${(lineNumber * lineHeight) + (padding * 2)}px`)
 					.attr('fill', '#fff')
-					.attr('stroke', getColor(data[ 0 ].position))
+					.attr('stroke', getColor(data[0].position))
 
 			}
 			text.remove()
@@ -220,6 +135,16 @@ const diagram = (svg, candidates, states) => {
 	svg.append('g').classed('states', true);
 	svg.append('g').classed('statesNames', true);
 	svg.append('g').classed('candidates', true);
+
+	svg.append('line')
+		.attr('x1', radius + stateRadius)
+		.attr('x2', radius + stateRadius)
+		.attr('y1', (stateRadius * 2) + 5)
+		.attr('y2', (radius * 2))
+		.attr('stroke', '#000')
+		.attr('stroke-width', 1)
+		.attr('stroke-dasharray', '10 10');
+
 	svg.append('g').classed('tooltip', true);
 
 	const update = (selectedState) => {
@@ -406,24 +331,6 @@ const diagram = (svg, candidates, states) => {
 					: 0),
 			);
 
-		svg.append('line')
-			.attr('x1', radius + stateRadius)
-			.attr('x2', radius + stateRadius)
-			.attr('y1', (stateRadius * 2) + 5)
-			.attr('y2', (radius * 2))
-			.attr('stroke', '#000')
-			.attr('stroke-width', 1)
-			.attr('stroke-dasharray', '10 10');
-
-		svg.append('line')
-			.attr('x1', (stateRadius * 2) - (stateRadius * 2) + 5)
-			.attr('x2', (radius * 2) + (stateRadius * 2))
-			.attr('y1', radius + stateRadius)
-			.attr('y2', radius + stateRadius)
-			.attr('stroke', '#000')
-			.attr('stroke-width', 1)
-			.attr('stroke-dasharray', '10 10');
-
 		svg.selectAll('.state').on('click', state => changeState(state));
 		stateNameBG.on('click', state => changeState(state));
 
@@ -453,5 +360,5 @@ const diagram = (svg, candidates, states) => {
 		  .alpha(1)
 		  .restart()
 	};
-	update(null, null)
+	update(null)
 };
