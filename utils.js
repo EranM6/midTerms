@@ -24,7 +24,7 @@ const getCandidatesNodes = ({
 }) => (
 	candidates
 		.reduce((candidates, candidate) => {
-			const positionMap = { '-2': 0, '-1': 1, 0: 2, 1: 3, 2: 4 };
+			const positionMap = { 'dem': 0, 'dem-leaning': 1, 'tossup': 2, 'gop-leaning': 3, 'gop': 4 };
 			const arrayPosition = positionMap[ candidate.position ];
 			candidates[ arrayPosition ].push(candidate);
 			return candidates
@@ -37,10 +37,12 @@ const getCandidatesNodes = ({
 			};
 
 			const getDistanceFromEdge = function(radius){
-				switch (Math.abs(candidatesOfType[0].position)) {
-					case 2:
+				switch (candidatesOfType[0].position) {
+					case 'dem':
+					case 'gop':
 						return (Math.sqrt(radius) / stateRadius) + ((1 / stateRadius) * Math.pow(candidateRadius / 3, 1));
-					case 1:
+          case 'dem-leaning':
+          case 'gop-leaning':
 						return (Math.sqrt(radius) / stateRadius) + ((1 / stateRadius) * Math.pow(candidateRadius / 3, 2));
 					default:
 						return (Math.sqrt(radius) / stateRadius) + ((1 / stateRadius) * Math.pow(candidateRadius / 3, 3));
@@ -58,14 +60,14 @@ const getCandidatesNodes = ({
 						.range([0, candidatesOfType.length])
 						.domain([lastIndex, candidatesOfType.length]);
 
-					if (candidate.position < 0) {
+					if (candidate.position.includes('dem')) {
 						const angle = (candidatesOfType.length - lastIndex) < itemsPerArc
 							? ((scale(index) + 0.5) / candidatesOfType.length) * Math.PI * -1
 							: (((index - lastIndex) + 0.5) / itemsPerArc) * Math.PI * -1;
 						candidate.x = (radius / distanceFromEdge * Math.sin(angle)) + (dimensions / 2);
 						candidate.y = (radius / distanceFromEdge * Math.cos(angle)) + (dimensions / 2);
 					}
-					else if (candidate.position > 0) {
+					else if (candidate.position.includes('gop')) {
 						const angle = (candidatesOfType.length - lastIndex) < itemsPerArc
 							? ((scale(index) + 0.5) / candidatesOfType.length) * Math.PI
 							: (((index - lastIndex) + 0.5) / itemsPerArc) * Math.PI;
@@ -110,13 +112,13 @@ const wrapText = (context, name, words, lineWidth) => {
 
 const getColor = (position, opacity) => {
 	switch (position) {
-		case -2:
+		case 'dem':
 			return opacity ? `rgba(0, 73, 182, ${opacity})` : '#0049B6';
-		case -1:
+		case 'dem-leaning':
 			return opacity ? `rgba(127, 163, 219, ${opacity})` : '#7FA3DB';
-		case 1:
+		case 'gop-leaning':
 			return opacity ? `rgba(240, 140, 145, ${opacity})` : '#F08C91';
-		case 2:
+		case 'gop':
 			return opacity ? `rgba(225, 25, 35, ${opacity})` : '#E11923';
 		default:
 			return opacity ? `rgba(178, 178, 178, ${opacity})` : '#B2B2B2'

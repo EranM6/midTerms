@@ -3,6 +3,8 @@ const canvasDiagram = (canvas, candidates, states) => {
 	const width = canvas.node().width;
 	const height = canvas.node().height;
 	const fontFamily = getComputedStyle(document.body).fontFamily.split(',')[0].slice(1,-1);
+	const direction = getComputedStyle(canvas.node()).direction;
+	const isEng = direction === 'ltr';
 
 	const {
 		radius,
@@ -30,7 +32,7 @@ const canvasDiagram = (canvas, candidates, states) => {
 			if (
 				selectedState &&
 				selectedCandidate &&
-				candidate.info &&
+				(isEng ? candidate.engNote : candidate.hebNote) &&
 				selectedState.symbol === candidate.state &&
 				selectedCandidate.name === candidate.name
 			) {
@@ -38,18 +40,26 @@ const canvasDiagram = (canvas, candidates, states) => {
 				context.textAlign = 'start';
 				context.fillStyle = '#000';
 
-				const words = candidate.info.split(/\s+/);
+				const words = isEng ? candidate.engNote.split(/\s+/) : candidate.hebNote.split(/\s+/);
 				const lineWidth = 120;
 				const padding = 20;
-				const lines = wrapText(context, candidate.name, words, lineWidth - (padding * 2));
+				const lines = wrapText(
+					context,
+          isEng ? candidate.name : candidate.hebName,
+					words,
+					lineWidth - (padding * 2)
+				);
 				let lineNumber = lines.length;
 				const lineHeight = 24;
 				const tooltipWidth = lineWidth + (padding * 2);
 				const tooltipHeight = (lineNumber * lineHeight) + (padding * 2);
+				const lineXOffset = isEng
+					? candidate.x + (padding / 2)
+					: candidate.x - (padding / 2) + tooltipWidth;
 				lines.forEach((line, i) => {
 					const lineX = candidate.x + tooltipWidth > width
-						? (candidate.x + (padding / 2)) - (candidate.x + tooltipWidth - width)
-						: candidate.x + (padding / 2);
+						? lineXOffset - (candidate.x + tooltipWidth - width)
+						: lineXOffset;
 					const lineY = candidate.y + tooltipHeight > height
 						? (candidate.y + (lineHeight * (i +1)) + (padding / 2)) - (candidate.y + tooltipHeight - height) - 5
 						: candidate.y + (lineHeight * (i + 1)) + (padding / 2);
@@ -94,15 +104,15 @@ const canvasDiagram = (canvas, candidates, states) => {
 			// Draw the candidates names.
 			candidatesNodes.forEach(candidate => {
 				if (
-					candidate.info &&
+          (isEng ? candidate.engNote : candidate.hebNote) &&
 					selectedState.symbol === candidate.state &&
 					(!selectedCandidate || selectedCandidate.name !== candidate.name)
 				) {
 					context.font = `bold 18px ${fontFamily}`;
-					context.textAlign = 'start';
+					context.textAlign = isEng ? 'start' : 'end';
 					context.fillStyle = '#000';
 					context.fillText(
-						candidate.name,
+            isEng ? candidate.name : candidate.hebName,
 						candidate.x + candidateRadius + 2,
 						candidate.y + candidateRadius * 0.5,
 					);
@@ -122,7 +132,11 @@ const canvasDiagram = (canvas, candidates, states) => {
 					context.font = `16px ${fontFamily}`;
 					context.textAlign = 'center';
 					context.fillStyle = '#FFF';
-					context.fillText(state.name, xPosition + (((state.name.length * 9) + 10) / 2), state.y + 6);
+					context.fillText(
+            isEng ? state.name : state.hebName,
+						xPosition + (((state.name.length * 9) + 10) / 2),
+						state.y + 6
+					);
 
 					const rectX = xPosition;
 					const rectY = state.y - ((stateRadius * 1.5) / 2);
@@ -172,7 +186,7 @@ const canvasDiagram = (canvas, candidates, states) => {
 				context.arc(
 					candidate.x,
 					candidate.y,
-					selectedState && !candidate.info
+					selectedState && !(isEng ? candidate.engNote : candidate.hebNote)
 						? candidateRadius / 2
 						: candidateRadius
 					,
@@ -228,7 +242,9 @@ const canvasDiagram = (canvas, candidates, states) => {
 			const dx = candidate.x - x;
 			const dy = candidate.y - y;
 			const distance = Math.sqrt((dx * dx) + (dy * dy));
-			if (candidate.info && distance < stateRadius && candidate.state === activeState.symbol) {
+			if (
+				(isEng ? candidate.engNote : candidate.hebNote) && distance < stateRadius &&
+				candidate.state === activeState.symbol) {
 				isCandidate = candidate;
 			}
 		});

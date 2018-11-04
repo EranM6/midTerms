@@ -1,4 +1,7 @@
 const svgDiagram = (svg, candidates, states) => {
+  const direction = getComputedStyle(svg.node()).direction;
+  const isEng = direction === 'ltr';
+
 	const {
 		radius,
 		candidateRadius,
@@ -99,27 +102,33 @@ const svgDiagram = (svg, candidates, states) => {
 				const tooltip = svg.select('.tooltip').append('g')
 					.attr('class', className)
 					.attr('opacity', 0)
-					.attr('style', 'pointer-events: none; direction: rtl; font-size: 18px;')
+					.attr('style', `pointer-events: none; direction: ${direction}; font-size: 18px;`)
 					.data(data);
 				const bg = tooltip.append('rect');
 				tooltip.append('text')
-					.attr('x', width + padding)
+					.attr('x', isEng ? padding : width + padding)
 					.attr('y', 0)
 					.attr('dy', `${(++lineNumber * lineHeight) + (padding / 2)}px`)
 					.attr('style', 'font-weight: 700; Line-height:30px;')
-					.text(data[ 0 ].name);
-				let newText = tooltip.append('text').attr('x', width + padding).attr('y', 0).attr('dy', `${(++lineNumber * lineHeight) + padding}px`);
-				// while (word = words.pop()) {
-				// 	line.push(word);
-				// 	newText.text(line.join(' '));
-				// 	if (newText.node().getComputedTextLength() > width) {
-				// 		line.pop();
-				// 		newText.text(line.join(' '));
-				// 		line = [ word ];
-				// 		newText = tooltip.append('text').attr('x', width + padding).attr('y', 0).attr('dy', `${(++lineNumber * lineHeight) + padding}px`)
-				// 			.text(word)
-				// 	}
-				// }
+					.text(isEng ? data[0].name : data[0].hebName);
+				let newText = tooltip.append('text')
+					.attr('x', isEng ? padding : width + padding)
+					.attr('y', 0)
+					.attr('dy', `${(++lineNumber * lineHeight) + padding}px`);
+				while (word = words.pop()) {
+					line.push(word);
+					newText.text(line.join(' '));
+					if (newText.node().getComputedTextLength() > width) {
+						line.pop();
+						newText.text(line.join(' '));
+						line = [ word ];
+						newText = tooltip.append('text')
+							.attr('x', isEng ? padding : width + padding)
+							.attr('y', 0)
+							.attr('dy', `${(++lineNumber * lineHeight) + padding}px`)
+							.text(word)
+					}
+				}
 				bg
 					.attr('width', `${width + (padding * 2)}px`)
 					.attr('height', `${(lineNumber * lineHeight) + (padding * 2)}px`)
@@ -202,7 +211,7 @@ const svgDiagram = (svg, candidates, states) => {
 			.attr('r', d => {
 				if (selectedState) {
 					if (selectedState.symbol === d.state) {
-						if (d.info) return candidateRadius;
+						if (isEng ? d.engNote : d.hebNote) return candidateRadius;
 						return candidateRadius / 2
 					}
 					return 0
@@ -215,18 +224,19 @@ const svgDiagram = (svg, candidates, states) => {
 			.attr('class', d => `${d.name.split(' ')[ 0 ]}-${d.state} name`)
 			.attr('opacity', 0)
 			.attr('style', 'font-weight: 700; Line-height:30px; pointer-events: none;')
-			.text(d => d.name);
+			.attr('text-anchor', isEng ? 'start' : 'end')
+			.text(d => isEng ? d.name : d.hebName);
 
 		candidate.enter()
 			.append('text')
 			.attr('class', d => `${d.name.split(' ')[ 0 ]}-${d.state} info`)
-			.text(d => d.info)
+			.text(d => isEng ? d.engNote : d.hebNote)
 			.call(addTextElements);
 
 		svg.selectAll('.candidates > text')
 			.transition(t)
 			.attr('opacity', d => {
-				if (activeState && d.info) {
+				if (activeState && (d.engNote || d.hebNote)) {
 					if (activeState.symbol === d.state) {
 						return 1
 					}
@@ -323,7 +333,7 @@ const svgDiagram = (svg, candidates, states) => {
 			.attr('y', d => d.y)
 			.attr('dx', '0')
 			.attr('dy', '5')
-			.text(d => d.name)
+			.text(d => isEng ? d.name : d.hebName)
 			.transition(t)
 			.attr('opacity', d =>
 				(selectedState && selectedState.symbol === d.symbol
