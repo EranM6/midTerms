@@ -2,9 +2,13 @@ const canvasDiagram = (canvas, legendSvg, candidates, states) => {
 	const context = canvas.node().getContext('2d');
 	const width = canvas.node().width;
 	const height = canvas.node().height;
-	const fontFamily = getComputedStyle(document.body).fontFamily.split(',')[0].slice(1,-1);
+	let fontFamily = getComputedStyle(document.body).fontFamily.split(',')[0];
 	const direction = getComputedStyle(canvas.node()).direction;
 	const isEng = direction === 'ltr';
+
+	if(!isEng) {
+		fontFamily = fontFamily.slice(1,-1);
+	};
 
 	buildLegend(legendSvg, candidates);
 

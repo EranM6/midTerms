@@ -4,6 +4,7 @@
 	<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
 	<script type="text/javascript" src="data.js"></script>
 	<script type="text/javascript" src="utils.js"></script>
+	<script type="text/javascript" src="legendText.js"></script>
 	<script type="text/javascript" src="legend.js"></script>
 	<script type="text/javascript" src="svgDiagram.js"></script>
 	<script type="text/javascript" src="mobileDiagram.js"></script>
@@ -33,18 +34,36 @@
 			height: 840px;
 		}
 
-		.canvasDiagrams {
+		.canvas {
 			display: flex;
 			width: 100%;
 			/*flex-direction: column;*/
 		}
 
-		.canvasDiagrams svg {
+		.canvas svg {
 			font-weight: 700;
+			margin-bottom: 2rem;
+		}
+
+		.container {
+			padding: 1rem;
+			width: 100%;
+		}
+
+		.tie {
+			text-align: center;
+			font-size: 20px;
+		}
+
+		.tie > .triangle {
+			margin: auto;
+			width: 10px;
+			height: 10px;
+			border: 10px solid transparent;
+			border-top-color: black;
 		}
 
 		.wrapper {
-			width: 100%;
 			height: 0;
 			padding-bottom: 100%;
 			position: relative;
@@ -57,7 +76,7 @@
 		canvas {
 			position: absolute;
 			width: 100%;
-			height: 50%;
+			height: 100%;
 		}
 	</style>
 </head>
@@ -77,8 +96,8 @@
 		<!--xmlns="http://www.w3.org/2000/svg"-->
 		<!--xml:lang='he'></svg>-->
 <!--</div>-->
-<div class="canvasDiagrams">
-	<div class="wrapper">
+<div class="canvas">
+	<div class="container senate">
 	  <svg
 	    class="senateLegend"
 	    width="100%"
@@ -86,10 +105,15 @@
 	    xmlns="http://www.w3.org/2000/svg"
 	  >
 	  </svg>
-		<canvas class="senate" width='840' height='840'></canvas>
+		<div class="tie">
+			<span>קו השוויון</span>
+			<div class="triangle"></div>
+		</div>
+		<div class="wrapper">
+			<canvas class="senateDiagram" width='840' height='840'></canvas>
+		</div>
 	</div>
-
-	<div class="wrapper">
+	<div class="container house">
 		<svg
 			class="houseLegend"
 			width="100%"
@@ -97,7 +121,9 @@
 			xmlns="http://www.w3.org/2000/svg"
 		>
 		</svg>
-		<canvas class="house" width='840' height='840'></canvas>
+		<div class="wrapper">
+			<canvas class="houseDiagram" width='840' height='840'></canvas>
+		</div>
 	</div>
 </div>
 
@@ -105,8 +131,8 @@
 	// svgDiagram(d3.selectAll('.svgDiagrams > .senate'), senate, states);
 	// svgDiagram(d3.selectAll('.svgDiagrams > .house'), house, states);
 
-	canvasDiagram(d3.selectAll('.canvasDiagrams .senate'), d3.selectAll('.canvasDiagrams .senateLegend'), senate, states);
-	canvasDiagram(d3.selectAll('.canvasDiagrams .house'), d3.selectAll('.canvasDiagrams .houseLegend'), house, states)
+	canvasDiagram(d3.selectAll('.canvas .senateDiagram'), d3.selectAll('.canvas .senateLegend'), senate, states);
+	canvasDiagram(d3.selectAll('.canvas .houseDiagram'), d3.selectAll('.canvas .houseLegend'), house, states)
 
 </script>
 </body>
